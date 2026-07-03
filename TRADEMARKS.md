@@ -1,4 +1,3 @@
-
 ## Introduction
 
 This is the FOSSil Project's policy for the use of our trademarks. While our work is available under free and open source software licenses, those licenses do not include a license to use our trademarks.
@@ -34,4 +33,12 @@ However, you may use our Marks for the distribution of code (source or executabl
 
 ## Statements about your software's relation to our software
 
-You may use the word Marks, but not the FOSSil Project's logos, to truthfully describe the relationship between your software and ours. Our Mark should b
+You may use the word Marks, but not the FOSSil Project's logos, to truthfully describe the relationship between your software and ours. Our Mark should be used after a verb or preposition that describes the relationship between your software and ours. So you may say, for example, "Bob's software for the FOSSil chat platform" but may not say "Bob's FOSSil software." Some other examples that may work for you are:
+
+* [Your software] uses FOSSil software
+* [Your software] is powered by FOSSil software
+* [Your software] runs on FOSSil software
+* [Your software] for use with FOSSil software
+* [Your software] for FOSSil software
+
+These guidelines are based on the [Model Trademark Guidelines](http://www.modeltrademarkguidelines.org), used under a [Creative Commons Attribution 3.0 Unported license](https://creativecommons.org/licenses/by/3.0/deed.en).
