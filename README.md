@@ -1,4 +1,8 @@
-# FOSSil CHAT
-## A work-in-progress chat platform involving decentralised hosting, strong security and encryption ([E2EE](https://en.wikipedia.org/wiki/End-to-end_encryption)), and an overall privacy-oriented and user-friendly experience.
+FOSSil Chat
 
-This project is licensed under the GNU AGPL-3.0-or-later.
+A work-in-progress, privacy-focused chat platform featuring community-hosted, decentralised servers, end-to-end encryption (E2EE), and a user-friendly experience.
+
+[!WARNING]
+FOSSil is currently under active development and is not yet ready for production use. Features, protocols, and APIs may change without notice.
+
+This project is licensed under the GNU AGPL-3.0 License.
