@@ -1,15 +1,30 @@
-use crate::packet::{Message, Packet};
+use crate::packet::Packet;
+use crate::server::ServerState;
 
-pub fn packet_handler(packet_type: Packet, packet_payload: Message) {
+pub fn packet_handler(state: &mut ServerState, packet_type: Packet) {
     match packet_type {
-        Packet::Message(text) => {
-            println!("Message: {}", text)
+        Packet::Message { user, content } => {
+            handle_message(user, content);
         }
         Packet::Join(name) => {
-            println!("Joined: {}", name)
+            handle_join(state, name);
         }
         Packet::Leave(name) => {
-            println!("Left: {}", name)
+            handle_leave(state, name);
         }
     }
+}
+
+fn handle_join(state: &mut ServerState, name: String) {
+    println!("\n{} joined.", name);
+    state.connected_users.push(name);
+}
+
+fn handle_leave(state: &mut ServerState, name: String) {
+    println!("\n{} left.", name);
+    state.connected_users.retain(|user| user != &name);
+}
+
+fn handle_message(user: String, content: String) {
+    println!("\n{} said '{}'", user, content)
 }
