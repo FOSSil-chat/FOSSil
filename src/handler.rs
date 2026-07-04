@@ -1,7 +1,6 @@
-use crate::packet::Packet;
 use crate::packet::Message;
+use crate::packet::Packet;
 use crate::server::ServerState;
-
 
 pub fn packet_handler(state: &mut ServerState, packet_type: Packet) {
     // Packet handler function
@@ -35,7 +34,8 @@ fn handle_leave(state: &mut ServerState, name: String) {
 
 fn handle_message(state: &mut ServerState, user: String, content: String) {
     println!("\n{} said '{}'", user, content); // Prints that the user sent a message, with the message content and sender
-    state.messages.push(Message { // Pushes a Message to the messages Vec
+    state.messages.push(Message {
+        // Pushes a Message to the messages Vec
         user,
         content,
     });

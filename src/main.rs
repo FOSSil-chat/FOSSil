@@ -34,9 +34,9 @@ fn main() {
 
     print_state(&state); // Prints server state
     packet_handler(&mut state, packet1); // Sends fake packets
-    print_state(&state); 
+    print_state(&state);
     packet_handler(&mut state, packet2);
-    print_state(&state); 
+    print_state(&state);
     packet_handler(&mut state, packet3);
-    print_state(&state); 
+    print_state(&state);
 }
