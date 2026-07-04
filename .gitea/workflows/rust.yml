@@ -12,23 +12,26 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: https://data.forgejo.org/actions/checkout@v4
+        uses: actions/checkout@v4
 
-      - name: Install Rust
-        run: |
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          source $HOME/.cargo/env
-          rustup default stable
-          rustup component add rustfmt clippy
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          override: true
 
-      - name: Add cargo to PATH
-        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
 
       - name: Check formatting
         run: cargo fmt -- --check
 
+      - name: Build
+        run: cargo build --all --all-features --locked
+
       - name: Run clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --locked -- -D warnings
 
       - name: Run tests
-        run: cargo test
+        run: cargo test --all --all-features --locked

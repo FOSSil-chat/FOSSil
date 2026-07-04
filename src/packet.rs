@@ -6,6 +6,8 @@ pub enum Packet {
 }
 
 pub struct Message {
-    pub user: String,
-    pub content: String,
+    pub id: u64,         // Message ID
+    pub user: String,    // Name of the user who sent the message
+    pub content: String, // Content of the message
+    pub timestamp: u64,  // Timestamp of the message
 }
