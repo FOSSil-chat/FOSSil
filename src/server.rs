@@ -1,3 +1,7 @@
+use crate::packet::Message;
+
 pub struct ServerState {
-    pub connected_users: Vec<String>,
+    // ServerState struct
+    pub connected_users: Vec<String>, // Connected users Vec 
+    pub messages: Vec<Message>, // Messages Vec storing Message struct
 }
