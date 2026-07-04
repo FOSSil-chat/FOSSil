@@ -14,26 +14,26 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-- name: Install Rust
-  run: |
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
+      - name: Install Rust
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-- name: Check formatting
-  run: |
-    source $HOME/.cargo/env
-    cargo fmt -- --check
+      - name: Check formatting
+        run: |
+          source $HOME/.cargo/env
+          cargo fmt -- --check
 
-- name: Build
-  run: |
-    source $HOME/.cargo/env
-    cargo build --all --all-features --locked
+      - name: Build
+        run: |
+          source $HOME/.cargo/env
+          cargo build --all --all-features --locked
 
-- name: Clippy
-  run: |
-    source $HOME/.cargo/env
-    cargo clippy --locked -- -D warnings
+      - name: Run clippy
+        run: |
+          source $HOME/.cargo/env
+          cargo clippy --locked -- -D warnings
 
-- name: Tests
-  run: |
-    source $HOME/.cargo/env
-    cargo test --all --all-features --locked
+      - name: Run tests
+        run: |
+          source $HOME/.cargo/env
+          cargo test --all --all-features --locked
