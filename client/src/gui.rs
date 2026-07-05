@@ -13,7 +13,7 @@ pub fn main() {
 struct FOSSilChat {}
 
 impl FOSSilChat {
-    fn new(cc: &eframe::CreationContext<'_>) -> Self {
+    fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         //persistence, set global style, set global font, graphics shaders/buffers
 
         Self::default()
@@ -21,7 +21,7 @@ impl FOSSilChat {
 }
 
 impl eframe::App for FOSSilChat {
-    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ui, |ui| {
             ui.heading("Hello World!");
             // widgets
