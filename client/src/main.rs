@@ -7,9 +7,7 @@ use std::io::{self, Write};
 use std::net::TcpStream;
 
 fn main() {
-<<<<<<< HEAD
     let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap(); // Creates TcpStream at localhost:7878
-=======
     
     gui::main();
 
@@ -24,7 +22,7 @@ fn main() {
     */
 
     let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap();
->>>>>>> df43b35 (Starting to implement GUI)
+
     let mut name = String::new();
 
     print!("Enter your name: "); // Asks use for their name, then sends Packet::Join to the server
