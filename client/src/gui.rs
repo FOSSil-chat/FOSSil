@@ -2,7 +2,7 @@ use eframe::egui;
 
 pub fn main() {
     let native_options = eframe::NativeOptions::default();
-    eframe::run_native(
+    let _ = eframe::run_native(
         "FOSSil Chat",
         native_options,
         Box::new(|cc| Ok(Box::new(FOSSilChat::new(cc)))),
