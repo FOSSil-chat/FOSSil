@@ -1,11 +1,30 @@
 // Imports & Declarations
 mod packet;
+mod gui;
+// mod network;
 use packet::Packet;
 use std::io::{self, Write};
 use std::net::TcpStream;
 
 fn main() {
+<<<<<<< HEAD
     let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap(); // Creates TcpStream at localhost:7878
+=======
+    
+    gui::main();
+
+    /* code below should be placed in a seperate file source so main.rs can directly declare and run the end variation of the code
+     below suited for the gui and the gui source itself concurrently on different threads when compiled.
+    */
+
+    /*
+    std::thread::spawn(|| {
+        network::run();
+    });
+    */
+
+    let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap();
+>>>>>>> df43b35 (Starting to implement GUI)
     let mut name = String::new();
 
     print!("Enter your name: "); // Asks use for their name, then sends Packet::Join to the server
