@@ -1,14 +1,14 @@
+// Imports & Declarations
 mod packet;
 use packet::Packet;
 use std::io::{self, Write};
 use std::net::TcpStream;
-use serde_json;
 
 fn main() {
-    let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap();
+    let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap(); // Creates TcpStream at localhost:7878
     let mut name = String::new();
 
-    print!("Enter your name: ");
+    print!("Enter your name: "); // Asks use for their name, then sends Packet::Join to the server
     io::stdout().flush().unwrap();
     io::stdin()
         .read_line(&mut name)
@@ -19,6 +19,7 @@ fn main() {
     stream.write_all(json_join.as_bytes()).unwrap();
     stream.write_all(b"\n").unwrap();
     loop {
+        // Repeatedly asks user for their message, sends packet to server
         let mut content = String::new();
         print!("Message: ");
         io::stdout().flush().unwrap();

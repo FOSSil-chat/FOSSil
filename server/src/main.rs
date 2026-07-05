@@ -3,11 +3,8 @@ mod handler;
 mod packet;
 mod server;
 mod tcp;
+
 use crate::server::ServerState;
-use chrono::{TimeZone, Utc};
-use handler::packet_handler;
-use packet::Packet;
-use std::net::TcpListener;
 use tcp::tcp_listener;
 
 // Main function
@@ -18,5 +15,5 @@ fn main() {
         next_message_id: 0,
     };
 
-    tcp_listener(&mut state);
+    tcp_listener(&mut state); // Calls tcp_listener() function in tcp.rs
 }
