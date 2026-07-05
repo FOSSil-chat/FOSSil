@@ -1,8 +1,8 @@
 use eframe::egui;
 
-fn main() {
+pub fn main() {
     let native_options = eframe::NativeOptions::default();
-    eframe::run_native("FOSSil Chat", native_options, Box::new(|cc| Ok(Box::new(FOSSilChat::new(cc)))))
+    eframe::run_native("FOSSil Chat", native_options, Box::new(|cc| Ok(Box::new(FOSSilChat::new(cc)))));
 }
 
 #[derive(Default)]
@@ -20,9 +20,8 @@ impl FOSSilChat {
 impl eframe::App for FOSSilChat {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ui, |ui| {
-            ui.heading("Hello World!")
+            ui.heading("Hello World!");
             // widgets
         });
-
     }
 }
