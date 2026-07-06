@@ -1,12 +1,11 @@
 use crate::handler::packet_handler;
 use crate::packet::Packet;
 use crate::server::ServerState;
+use std::io::Write;
 use std::io::{BufRead, BufReader};
 use std::net::TcpListener;
-use std::sync::{Arc, Mutex};
-use std::io::{self, Write};
 use std::net::TcpStream;
-
+use std::sync::{Arc, Mutex};
 
 pub fn tcp_listener(state: Arc<Mutex<ServerState>>) {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap(); // Creates TcpListener on localhost:7878

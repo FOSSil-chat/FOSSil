@@ -4,8 +4,8 @@ mod packet;
 mod server;
 mod tcp;
 
-use std::sync::{Arc, Mutex};
 use crate::server::ServerState;
+use std::sync::{Arc, Mutex};
 use tcp::tcp_listener;
 
 // Main function

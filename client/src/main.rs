@@ -7,6 +7,6 @@ fn main() {
     //gui::main();
 
     //std::thread::spawn(|| {
-        network::run();
+    network::run();
     //});
 }

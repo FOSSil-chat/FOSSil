@@ -2,10 +2,10 @@
 use crate::packet::Message;
 use crate::packet::Packet;
 use crate::server::ServerState;
+use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
 use std::sync::{Arc, Mutex};
-use crate::tcp::send_error;
 
 pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
     // Packet handler function
