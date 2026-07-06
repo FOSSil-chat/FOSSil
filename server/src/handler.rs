@@ -5,6 +5,7 @@ use crate::server::ServerState;
 use chrono::DateTime;
 use chrono::Utc;
 use std::sync::{Arc, Mutex};
+use crate::tcp::send_error;
 
 pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
     // Packet handler function
@@ -48,6 +49,7 @@ fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), Strin
         return Err("Error: Name cannot be empty.".to_string());
     }
     if state.connected_users.contains(&name) {
+        send_error("ERROR_USER_EXISTS".to_string());
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
@@ -59,9 +61,11 @@ fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), Strin
 fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
     let mut state = state.lock().unwrap();
     if name.is_empty() {
+        send_error("ERROR_NAME_EMPTY".to_string());
         return Err("Error: Name cannot be empty.".to_string());
     }
     if !state.connected_users.contains(&name) {
+        send_error("ERROR_USER_NOT_EXISTS".to_string());
         return Err("Error: User does not exist.".to_string());
     }
     // Leave handler
@@ -77,9 +81,11 @@ fn handle_message(
 ) -> Result<(u64, i64), String> {
     let mut state = state.lock().unwrap();
     if user.is_empty() {
+        send_error("ERROR_MISSING_SENDER".to_string());
         return Err("Error: Message does not have a sender.".to_string());
     }
     if content.is_empty() {
+        send_error("ERROR_MISSING_CONTENT".to_string());
         return Err("Error: Message does not have content.".to_string());
     }
     let timestamp = Utc::now().timestamp_millis();

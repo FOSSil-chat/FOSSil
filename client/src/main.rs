@@ -4,9 +4,9 @@ mod network;
 mod packet;
 
 fn main() {
-    gui::main();
+    //gui::main();
 
-    std::thread::spawn(|| {
+    //std::thread::spawn(|| {
         network::run();
-    });
+    //});
 }
