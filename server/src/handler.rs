@@ -4,8 +4,9 @@ use crate::packet::Packet;
 use crate::server::ServerState;
 use chrono::DateTime;
 use chrono::Utc;
+use std::sync::{Arc, Mutex};
 
-pub fn packet_handler(state: &mut ServerState, packet_type: Packet) {
+pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
     // Packet handler function
     match packet_type {
         Packet::Message { user, content } => {
@@ -41,7 +42,8 @@ pub fn packet_handler(state: &mut ServerState, packet_type: Packet) {
     }
 }
 
-fn handle_join(state: &mut ServerState, name: String) -> Result<(), String> {
+fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
+    let mut state = state.lock().unwrap();
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
@@ -54,7 +56,8 @@ fn handle_join(state: &mut ServerState, name: String) -> Result<(), String> {
     Ok(())
 }
 
-fn handle_leave(state: &mut ServerState, name: String) -> Result<(), String> {
+fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
+    let mut state = state.lock().unwrap();
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
@@ -68,10 +71,11 @@ fn handle_leave(state: &mut ServerState, name: String) -> Result<(), String> {
 }
 
 fn handle_message(
-    state: &mut ServerState,
+    state: Arc<Mutex<ServerState>>,
     user: String,
     content: String,
 ) -> Result<(u64, i64), String> {
+    let mut state = state.lock().unwrap();
     if user.is_empty() {
         return Err("Error: Message does not have a sender.".to_string());
     }
