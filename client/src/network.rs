@@ -5,7 +5,7 @@ use std::sync::mpsc::Sender;
 
 pub fn run(_tx: Sender<String>) {
     // Remove _ when communicating between GUI and network.rs
-    let mut stream = TcpStream::connect("127.0.0.1:7878").unwrap();
+    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap();
 
     let mut name = String::new();
 
