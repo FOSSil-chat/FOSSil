@@ -4,16 +4,22 @@ use std::net::TcpStream;
 use std::sync::mpsc::Sender;
 
 pub fn run(_tx: Sender<String>) {
-    // Remove _ when communicating between GUI and network.rs
-    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
+    let mut stream = TcpStream::connect("192.168.0.52:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
 
     let mut name = String::new();
 
-    print!("Enter your name: "); // Asks use for their name, then sends Packet::Join to the server
+    print!("Enter your name (or !exit to leave chat): "); // Asks use for their name, then sends Packet::Join to the server
     io::stdout().flush().unwrap();
     io::stdin()
         .read_line(&mut name)
         .expect("Failed to read line");
+
+    name = name.trim().to_string();
+
+    if name.to_lowercase() == "!exit" {
+        println!("Exiting...");
+        std::process::exit(0);
+    }
 
     let packet_join = Packet::Join(name.to_string()); // Creates Join packet and converts to JSON
     let json_join = serde_json::to_string(&packet_join).unwrap();
@@ -22,12 +28,20 @@ pub fn run(_tx: Sender<String>) {
     loop {
         // Repeatedly asks user for their message, sends packet to server
         let mut content = String::new();
-        print!("Message: ");
+        print!("Message (or !exit to leave chat): ");
         io::stdout().flush().unwrap();
         io::stdin()
             .read_line(&mut content)
             .expect("Failed to read line");
         let content = content.trim();
+        if content.to_lowercase() == "!exit" {
+            println!("Exiting...");
+            let packet_leave = Packet::Leave(name.to_string());
+            let json_leave = serde_json::to_string(&packet_leave).unwrap();
+            stream.write_all(json_leave.as_bytes()).unwrap();
+            stream.write_all(b"\n").unwrap();
+            std::process::exit(0);
+        }
         if content.is_empty() {
             println!("Message cannot be empty!");
             continue;

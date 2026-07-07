@@ -4,11 +4,16 @@ use fossil_client::network;
 use std::sync::mpsc;
 
 fn main() {
-    gui::main();
+    let (tx, rx) = mpsc::channel();
 
-    let (tx, _rx) = mpsc::channel(); // Allows communication between threads, temporarily unused
+    std::thread::spawn(move || {
+        network::run(tx);
+    });
 
-    //std::thread::spawn(move || {
-    network::run(tx);
-    //});
+    match gui::main() {
+        Ok(_) => (),
+        Err(_) => println!("Error in gui::main()"),
+    }
+
+    drop(rx);
 }
