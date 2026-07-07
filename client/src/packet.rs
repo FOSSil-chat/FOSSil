@@ -4,8 +4,5 @@ use serde::{Deserialize, Serialize};
 pub enum Packet {
     Join(String),
     Leave(String),
-    Message {
-        user: String,
-        content: String,
-    },
+    Message { user: String, content: String },
 }

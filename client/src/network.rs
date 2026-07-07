@@ -26,7 +26,7 @@ pub fn run() {
             .read_line(&mut content)
             .expect("Failed to read line");
         let content = content.trim();
-        if content == "" {
+        if content.is_empty() {
             println!("Message cannot be empty!");
             continue;
         }

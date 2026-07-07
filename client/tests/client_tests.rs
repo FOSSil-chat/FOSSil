@@ -1,7 +1,6 @@
 use fossil_client::packet::Packet;
 use serde_json;
 
-
 #[test]
 fn test_join_packet_creation() {
     let packet = Packet::Join("Alice".to_string());
@@ -14,17 +13,12 @@ fn test_join_packet_creation() {
     }
 }
 
-
 #[test]
 fn test_leave_packet_creation() {
     let packet = Packet::Leave("Alice".to_string());
 
-    assert_eq!(
-        packet,
-        Packet::Leave("Alice".to_string())
-    );
+    assert_eq!(packet, Packet::Leave("Alice".to_string()));
 }
-
 
 #[test]
 fn test_message_packet_creation() {
@@ -42,7 +36,6 @@ fn test_message_packet_creation() {
     );
 }
 
-
 #[test]
 fn test_packet_serialization() {
     let packet = Packet::Message {
@@ -55,7 +48,6 @@ fn test_packet_serialization() {
     assert!(json.contains("Alice"));
     assert!(json.contains("Hello"));
 }
-
 
 #[test]
 fn test_packet_deserialization() {
