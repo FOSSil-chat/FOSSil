@@ -26,6 +26,10 @@ pub fn run() {
             .read_line(&mut content)
             .expect("Failed to read line");
         let content = content.trim();
+        if content == "" {
+            println!("Message cannot be empty!");
+            continue;
+        }
         println!("Sending message from {}: '{}'", name, content);
 
         let packet_send = Packet::Message {

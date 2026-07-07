@@ -1,5 +1,5 @@
 [package]
-name = "FOSSil-Server"
+name = "fossil-server"
 version = "0.1.0"
 edition = "2021"
 

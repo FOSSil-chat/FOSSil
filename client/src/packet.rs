@@ -1,10 +1,11 @@
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-// Packet enum
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum Packet {
-    Join(String),                              // Variation 1: Join
-    Leave(String),                             // Variation 2: Leave
-    Message { user: String, content: String }, // Variation 3: Message
+    Join(String),
+    Leave(String),
+    Message {
+        user: String,
+        content: String,
+    },
 }

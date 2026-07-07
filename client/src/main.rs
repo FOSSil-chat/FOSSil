@@ -1,7 +1,6 @@
 // Imports & Declarations
-mod gui;
-mod network;
-mod packet;
+use fossil_client::gui;
+use fossil_client::network;
 
 fn main() {
     gui::main();

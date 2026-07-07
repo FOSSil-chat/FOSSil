@@ -43,7 +43,7 @@ pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
     }
 }
 
-fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
+pub fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
     let mut state = state.lock().unwrap();
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
@@ -58,7 +58,7 @@ fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), Strin
     Ok(())
 }
 
-fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
+pub fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
     let mut state = state.lock().unwrap();
     if name.is_empty() {
         send_error("ERROR_NAME_EMPTY".to_string());
@@ -74,7 +74,7 @@ fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), Stri
     Ok(())
 }
 
-fn handle_message(
+pub fn handle_message(
     state: Arc<Mutex<ServerState>>,
     user: String,
     content: String,
