@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 
 fn main() {
     let state = Arc::new(Mutex::new(ServerState {
+        // Creates server state and wraps in arc mutex
         connected_users: Vec::new(),
         messages: Vec::new(),
         next_message_id: 0,

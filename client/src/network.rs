@@ -5,7 +5,7 @@ use std::sync::mpsc::Sender;
 
 pub fn run(_tx: Sender<String>) {
     // Remove _ when communicating between GUI and network.rs
-    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap();
+    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
 
     let mut name = String::new();
 
@@ -15,7 +15,7 @@ pub fn run(_tx: Sender<String>) {
         .read_line(&mut name)
         .expect("Failed to read line");
 
-    let packet_join = Packet::Join(name.to_string());
+    let packet_join = Packet::Join(name.to_string()); // Creates Join packet and converts to JSON
     let json_join = serde_json::to_string(&packet_join).unwrap();
     stream.write_all(json_join.as_bytes()).unwrap();
     stream.write_all(b"\n").unwrap();
@@ -35,6 +35,7 @@ pub fn run(_tx: Sender<String>) {
         println!("Sending message from {}: '{}'", name, content);
 
         let packet_send = Packet::Message {
+            // Creates packet to send and writes to stream
             user: name.to_string(),
             content: content.to_string(),
         };

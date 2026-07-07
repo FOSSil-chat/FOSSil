@@ -82,11 +82,11 @@ pub fn handle_message(
     let mut state = state.lock().unwrap();
     if user.is_empty() {
         send_error("ERROR_MISSING_SENDER".to_string());
-        return Err("Error: Message does not have a sender.".to_string());
+        return Err("Error: Message does not have a sender.".to_string()); // Enforces sender
     }
     if content.is_empty() {
         send_error("ERROR_MISSING_CONTENT".to_string());
-        return Err("Error: Message does not have content.".to_string());
+        return Err("Error: Message does not have content.".to_string()); // Enforces content
     }
     let timestamp = Utc::now().timestamp_millis();
     let id = state.next_message_id;

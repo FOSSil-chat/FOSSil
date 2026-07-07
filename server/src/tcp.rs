@@ -27,6 +27,7 @@ pub fn tcp_listener(state: Arc<Mutex<ServerState>>) {
 }
 
 pub fn send_error(error_type: String) {
+    // BROKEN: Must use the stream from tcp_listener instead of creating new stream.
     let Ok(mut stream) = TcpStream::connect("127.0.0.1:7878") else {
         return;
     };
