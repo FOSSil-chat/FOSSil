@@ -1,10 +1,14 @@
-// Imports & Declarations
 use fossil_client::gui;
 use fossil_client::network;
 
+use std::sync::mpsc;
+
 fn main() {
-    std::thread::spawn(|| {
-        network::run();
+    let (tx, rx) = mpsc::channel();
+
+    std::thread::spawn(move || {
+        network::run(tx);
     });
-    gui::main();
+
+    gui::main(rx);
 }

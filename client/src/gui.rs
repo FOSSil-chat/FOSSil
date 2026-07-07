@@ -1,6 +1,8 @@
 use eframe::egui;
+use std::sync::mpsc::Receiver;
 
-pub fn main() {
+pub fn main(_rx: Receiver<String>) {
+    // Remove _ when communicating between GUI and network.rs (do same in network.rs) - tx is sender and rx is receiver
     let native_options = eframe::NativeOptions::default();
     let _ = eframe::run_native(
         "FOSSil Chat",
