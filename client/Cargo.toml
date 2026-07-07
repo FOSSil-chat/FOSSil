@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1", features = ["derive"] }
-eframe = { version = "0.35", features = ["wayland", "wgpu", "x11"] }
+eframe = { version = "0.31.1", features = ["default"] }
 
