@@ -1,4 +1,4 @@
-/*use eframe::egui;
+use eframe::egui;
 
 pub fn main() {
     let native_options = eframe::NativeOptions::default();
@@ -27,4 +27,4 @@ impl eframe::App for FOSSilChat {
             // widgets
         });
     }
-}*/
+}
