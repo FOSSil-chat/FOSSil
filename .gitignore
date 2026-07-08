@@ -3,6 +3,7 @@
 
 # Treedumper
 dump_tree.sh
+output.txt
 
 # Cargo lock 
 Cargo.lock
