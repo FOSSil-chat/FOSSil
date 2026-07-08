@@ -10,7 +10,7 @@ impl eframe::App for App {
     }
 }
 
-pub fn main() -> Result<(), eframe::Error> {
+pub async fn main() -> Result<(), eframe::Error> {
     println!("Hello World!");
     let options = eframe::NativeOptions {
         viewport: eframe::egui::ViewportBuilder::default()

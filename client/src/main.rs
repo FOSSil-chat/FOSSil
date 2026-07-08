@@ -1,19 +1,18 @@
 use fossil_client::gui;
 use fossil_client::network;
 
-use std::sync::mpsc;
+use tokio::sync::mpsc;
 
-fn main() {
-    let (tx, rx) = mpsc::channel();
+#[tokio::main]
+async fn main() {
+    let (_tx, rx) = mpsc::channel(100);
 
-    std::thread::spawn(move || {
-        network::run(tx);
+    tokio::spawn(async move {
+        network::run(rx).await;
     });
 
-    match gui::main() {
+    match gui::main().await {
         Ok(_) => (),
         Err(_) => println!("Error in gui::main()"),
     }
-
-    drop(rx);
 }

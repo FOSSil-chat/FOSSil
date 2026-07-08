@@ -1,10 +1,17 @@
 use crate::packet::Packet;
 use std::io::{self, Write};
-use std::net::TcpStream;
-use std::sync::mpsc::Sender;
+use tokio::net::TcpStream;
+use tokio::io::AsyncWriteExt;
+use tokio::sync::mpsc::Receiver;
 
-pub fn run(_tx: Sender<String>) {
-    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
+pub async fn run(mut _rx: Receiver<String>) {
+    let mut stream = match TcpStream::connect("fossil.simarpreetsingh.org:7878").await {
+        Ok(s) => s,
+        Err(_) => {
+            eprintln!("Failed to connect to server");
+            return;
+        }
+    };
 
     let mut name = String::new();
 
@@ -23,8 +30,15 @@ pub fn run(_tx: Sender<String>) {
 
     let packet_join = Packet::Join(name.to_string()); // Creates Join packet and converts to JSON
     let json_join = serde_json::to_string(&packet_join).unwrap();
-    stream.write_all(json_join.as_bytes()).unwrap();
-    stream.write_all(b"\n").unwrap();
+    if stream.write_all(json_join.as_bytes()).await.is_err() {
+        eprintln!("Failed to send join packet");
+        return;
+    }
+    if stream.write_all(b"\n").await.is_err() {
+        eprintln!("Failed to send newline");
+        return;
+    }
+
     loop {
         // Repeatedly asks user for their message, sends packet to server
         let mut content = String::new();
@@ -38,8 +52,12 @@ pub fn run(_tx: Sender<String>) {
             println!("Exiting...");
             let packet_leave = Packet::Leave(name.to_string());
             let json_leave = serde_json::to_string(&packet_leave).unwrap();
-            stream.write_all(json_leave.as_bytes()).unwrap();
-            stream.write_all(b"\n").unwrap();
+            if stream.write_all(json_leave.as_bytes()).await.is_err() {
+                eprintln!("Failed to send leave packet");
+            }
+            if stream.write_all(b"\n").await.is_err() {
+                eprintln!("Failed to send newline");
+            }
             std::process::exit(0);
         }
         if content.is_empty() {
@@ -54,7 +72,13 @@ pub fn run(_tx: Sender<String>) {
             content: content.to_string(),
         };
         let json_message = serde_json::to_string(&packet_send).unwrap();
-        stream.write_all(json_message.as_bytes()).unwrap();
-        stream.write_all(b"\n").unwrap();
+        if stream.write_all(json_message.as_bytes()).await.is_err() {
+            eprintln!("Failed to send message packet");
+            break;
+        }
+        if stream.write_all(b"\n").await.is_err() {
+            eprintln!("Failed to send newline");
+            break;
+        }
     }
 }
