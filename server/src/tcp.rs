@@ -8,7 +8,7 @@ use std::net::TcpStream;
 use std::sync::{Arc, Mutex};
 
 pub fn tcp_listener(state: Arc<Mutex<ServerState>>) {
-    let listener = TcpListener::bind("0.0.0.0:7878").unwrap(); // Creates TcpListener on localhost:7878
+    let listener = TcpListener::bind("fossil.simarpreetsingh.org:7878").unwrap(); // Creates TcpListener on localhost:7878
 
     println!("Server running...");
     for stream in listener.incoming() {
