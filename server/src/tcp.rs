@@ -36,7 +36,7 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
 }
 
 pub async fn send_error(mut writer: impl AsyncWriteExt + Unpin, error_type: String) {
-    let error_packet = Packet::Join(error_type);
+    let error_packet = Packet::Error(error_type);
     if let Ok(error_json) = serde_json::to_string(&error_packet) {
         let _ = writer.write_all(error_json.as_bytes()).await;
         let _ = writer.write_all(b"\n").await;

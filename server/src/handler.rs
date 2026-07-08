@@ -46,6 +46,10 @@ pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
                 Err(e) => println!("User leaving failed: '{}'", e),
             }
         }
+        Packet::Error(error_type) => {
+            // If the packet type is 'Error', it prints the error type
+            println!("Received error: {}", error_type);
+        }
     }
 }
 

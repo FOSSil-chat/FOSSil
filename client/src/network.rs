@@ -1,17 +1,48 @@
 use crate::packet::Packet;
 use std::io::{self, Write};
+use tokio::io::AsyncBufReadExt;
 use tokio::io::AsyncWriteExt;
+use tokio::io::BufReader;
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::Receiver;
 
 pub async fn run(mut _rx: Receiver<String>) {
-    let mut stream = match TcpStream::connect("192.168.0.52:7878").await {
+    let stream = match TcpStream::connect("192.168.0.52:7878").await {
         Ok(s) => s,
         Err(_) => {
             eprintln!("Failed to connect to server");
             return;
         }
     };
+
+    let (reader, mut writer) = stream.into_split();
+    let mut reader = BufReader::new(reader);
+
+    tokio::spawn(async move {
+        let mut line = String::new();
+
+        loop {
+            line.clear();
+            match reader.read_line(&mut line).await {
+                Ok(0) => break, // server disconnected :(
+                Ok(_) => match serde_json::from_str::<Packet>(&line) {
+                    Ok(Packet::Error(error)) => {
+                        eprintln!("Server Error: {}", error);
+                    }
+                    Ok(packet) => {
+                        eprintln!("Received: {:?}", packet);
+                    }
+                    Err(e) => {
+                        eprintln!("Invalid packet: {}", e)
+                    }
+                },
+                Err(e) => {
+                    eprintln!("Read error: {}", e);
+                    break;
+                }
+            }
+        }
+    });
 
     let mut name = String::new();
 
@@ -30,11 +61,11 @@ pub async fn run(mut _rx: Receiver<String>) {
 
     let packet_join = Packet::Join(name.to_string()); // Creates Join packet and converts to JSON
     let json_join = serde_json::to_string(&packet_join).unwrap();
-    if stream.write_all(json_join.as_bytes()).await.is_err() {
+    if writer.write_all(json_join.as_bytes()).await.is_err() {
         eprintln!("Failed to send join packet");
         return;
     }
-    if stream.write_all(b"\n").await.is_err() {
+    if writer.write_all(b"\n").await.is_err() {
         eprintln!("Failed to send newline");
         return;
     }
@@ -52,10 +83,10 @@ pub async fn run(mut _rx: Receiver<String>) {
             println!("Exiting...");
             let packet_leave = Packet::Leave(name.to_string());
             let json_leave = serde_json::to_string(&packet_leave).unwrap();
-            if stream.write_all(json_leave.as_bytes()).await.is_err() {
+            if writer.write_all(json_leave.as_bytes()).await.is_err() {
                 eprintln!("Failed to send leave packet");
             }
-            if stream.write_all(b"\n").await.is_err() {
+            if writer.write_all(b"\n").await.is_err() {
                 eprintln!("Failed to send newline");
             }
             std::process::exit(0);
@@ -72,11 +103,11 @@ pub async fn run(mut _rx: Receiver<String>) {
             content: content.to_string(),
         };
         let json_message = serde_json::to_string(&packet_send).unwrap();
-        if stream.write_all(json_message.as_bytes()).await.is_err() {
+        if writer.write_all(json_message.as_bytes()).await.is_err() {
             eprintln!("Failed to send message packet");
             break;
         }
-        if stream.write_all(b"\n").await.is_err() {
+        if writer.write_all(b"\n").await.is_err() {
             eprintln!("Failed to send newline");
             break;
         }
