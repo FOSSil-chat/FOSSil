@@ -21,7 +21,7 @@ pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
             let content_clone = content.clone();
 
             // If the packet type is 'message' it calls the handle_message() function
-            match handle_message(state, user, content).await {
+            match handle_message(state, user, content, writer).await {
                 Ok((id, timestamp)) => println!(
                     "{} said '{}' (ID {}) at {}.",
                     user_clone,
@@ -64,7 +64,6 @@ pub async fn handle_join<W: AsyncWriteExt + Unpin>(
     }
     if state.connected_users.contains(&name) {
         send_error(writer, "ERROR_USER_EXISTS".to_string()).await;
-        writer.shutdown().await.unwrap(); // <-- disconnect client
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
@@ -93,16 +92,19 @@ pub async fn handle_leave<W: AsyncWriteExt + Unpin>(
     Ok(())
 }
 
-pub async fn handle_message(
+pub async fn handle_message<W: AsyncWriteExt + Unpin>(
     state: Arc<Mutex<ServerState>>,
     user: String,
     content: String,
+    writer: &mut W,
 ) -> Result<(u64, i64), String> {
     let mut state = state.lock().await;
     if user.is_empty() {
+        send_error(writer, "ERROR_USER_EMPTY".to_string()).await;
         return Err("Error: Message does not have a sender.".to_string()); // Enforces sender
     }
     if content.is_empty() {
+        send_error(writer, "ERROR_CONTENT_EMPTY".to_string()).await;
         return Err("Error: Message does not have content.".to_string()); // Enforces content
     }
     let timestamp = Utc::now().timestamp_millis();

@@ -58,9 +58,7 @@ pub async fn run(mut _rx: Receiver<String>) {
                         Ok(packet) => {
                             match packet {
                                 Packet::Error(err) => {
-                                    // Explicit error handling
                                     println!("Server Error: {}", err);
-                                    std::process::exit(1); // disconnect client immediately
                                 }
                                 _ => {
                                     // Normal packet handling
