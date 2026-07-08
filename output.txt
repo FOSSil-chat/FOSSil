@@ -83,7 +83,10 @@ use tokio::sync::mpsc::Receiver;
 
 pub fn describe_packet(packet: &Packet) -> String {
     match packet {
-        Packet::Error(error) => format!("Server Error: {}", error),
+        Packet::Error(error) => {
+            println!("Server Error: {}", error);
+            std::process::exit(1);   // <-- disconnect client
+        }
         other => format!("Received: {:?}", other),
     }
 }
@@ -92,7 +95,10 @@ pub fn parse_packet_line(line: &str) -> Result<Packet, serde_json::Error> {
     serde_json::from_str::<Packet>(line.trim())
 }
 
-pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(writer: &mut W, packet: &Packet) -> io::Result<()> {
+pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(
+    writer: &mut W,
+    packet: &Packet,
+) -> io::Result<()> {
     let json = serde_json::to_string(packet).map_err(io::Error::other)?;
     writer.write_all(json.as_bytes()).await?;
     writer.write_all(b"\n").await?;
@@ -196,12 +202,12 @@ server/src/*
 server/src/handler.rs:
 ----------------------------------------
 // Imports and declarations
-use fossil_shared::message::Message;
-use fossil_shared::packet::Packet;
 use crate::server::ServerState;
 use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
+use fossil_shared::message::Message;
+use fossil_shared::packet::Packet;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Mutex;
@@ -259,8 +265,9 @@ pub async fn handle_join<W: AsyncWriteExt + Unpin>(
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
-    if state.connected_users.contains(&name) {
+    if state.connected_users.contains(&name) {  
         send_error(writer, "ERROR_USER_EXISTS".to_string()).await;
+        writer.shutdown().await.unwrap();   // <-- disconnect client
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
@@ -322,6 +329,7 @@ pub mod handler; // Imports necessary modules
 pub mod server;
 pub mod tcp;
 
+
 ----------------------------------------
 server/src/main.rs:
 ----------------------------------------
@@ -361,8 +369,8 @@ pub struct ServerState {
 server/src/tcp.rs:
 ----------------------------------------
 use crate::handler::packet_handler;
-use fossil_shared::packet::Packet;
 use crate::server::ServerState;
+use fossil_shared::packet::Packet;
 use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpListener;
@@ -397,10 +405,7 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
     }
 }
 
-pub async fn send_error<W: AsyncWriteExt + Unpin>(
-    writer: &mut W,
-    error_type: String,
-) {
+pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: String) {
     let error_packet = Packet::Error(error_type);
 
     if let Ok(error_json) = serde_json::to_string(&error_packet) {
@@ -409,13 +414,15 @@ pub async fn send_error<W: AsyncWriteExt + Unpin>(
         let _ = writer.flush().await;
     }
 }
+
 fossil_shared/src/*
 
 ----------------------------------------
 fossil_shared/src/lib.rs:
 ----------------------------------------
-pub mod packet;
 pub mod message;
+pub mod packet;
+
 
 ----------------------------------------
 fossil_shared/src/message.rs:
@@ -427,6 +434,7 @@ pub struct Message {
     pub timestamp: i64,
 }
 
+
 ----------------------------------------
 fossil_shared/src/packet.rs:
 ----------------------------------------
@@ -434,10 +442,11 @@ use serde::Deserialize;
 use serde::Serialize;
 
 // Packet enum
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub enum Packet {
     Join(String),                              // Variation 1: Join
     Leave(String),                             // Variation 2: Leave
     Message { user: String, content: String }, // Variation 3: Message
     Error(String),                             // Variation 4: Error
 }
+

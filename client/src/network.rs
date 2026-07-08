@@ -9,8 +9,7 @@ use tokio::sync::mpsc::Receiver;
 pub fn describe_packet(packet: &Packet) -> String {
     match packet {
         Packet::Error(error) => {
-            println!("Server Error: {}", error);
-            std::process::exit(1);   // <-- disconnect client
+            format!("Server Error: {}", error)
         }
         other => format!("Received: {:?}", other),
     }
