@@ -1,7 +1,7 @@
 use crate::packet::Packet;
 use std::io::{self, Write};
-use tokio::net::TcpStream;
 use tokio::io::AsyncWriteExt;
+use tokio::net::TcpStream;
 use tokio::sync::mpsc::Receiver;
 
 pub async fn run(mut _rx: Receiver<String>) {

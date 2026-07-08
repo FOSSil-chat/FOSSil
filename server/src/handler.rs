@@ -6,8 +6,8 @@ use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use tokio::io::AsyncWriteExt;
+use tokio::sync::Mutex;
 
 pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
     state: Arc<Mutex<ServerState>>,

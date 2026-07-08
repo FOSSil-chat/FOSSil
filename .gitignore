@@ -1,8 +1,8 @@
 # Rust build output
 **/target/
 
-# Cargo lock (optional: keep for apps, ignore for libraries only if needed)
-# Cargo.lock
+# Cargo lock 
+Cargo.lock
 
 # IDE/editor files
 .vscode/

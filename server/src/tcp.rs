@@ -1,9 +1,9 @@
 use crate::handler::packet_handler;
 use crate::packet::Packet;
 use crate::server::ServerState;
-use tokio::net::TcpListener;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use std::sync::Arc;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::TcpListener;
 use tokio::sync::Mutex;
 
 pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
