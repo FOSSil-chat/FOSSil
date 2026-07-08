@@ -1,5 +1,6 @@
 use fossil_shared::packet::Packet;
-use std::io::{self, Write};
+use std::io::Write;
+use tokio::io;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::AsyncWriteExt;
 use tokio::io::BufReader;
@@ -9,7 +10,7 @@ use tokio::sync::mpsc::Receiver;
 pub fn describe_packet(packet: &Packet) -> String {
     match packet {
         Packet::Error(error) => {
-            format!("Server Error: {}", error)
+            format!("\n\x1b[31mServer Error: {}\x1b[0m", error)
         }
         other => format!("Received: {:?}", other),
     }
@@ -43,34 +44,29 @@ pub async fn run(mut _rx: Receiver<String>) {
     let (reader, mut writer) = stream.into_split();
     let mut reader = BufReader::new(reader);
 
-    tokio::spawn(async move {
+    let stdin = io::stdin();
+    let mut stdin = BufReader::new(stdin);
+
+    let _handle = tokio::spawn(async move {
         let mut line = String::new();
 
         loop {
             line.clear();
+
             match reader.read_line(&mut line).await {
                 Ok(0) => {
                     println!("Server disconnected.");
                     break;
                 }
-                Ok(_) => {
-                    match parse_packet_line(&line) {
-                        Ok(packet) => {
-                            match packet {
-                                Packet::Error(err) => {
-                                    println!("Server Error: {}", err);
-                                }
-                                _ => {
-                                    // Normal packet handling
-                                    println!("{}", describe_packet(&packet));
-                                }
-                            }
-                        }
-                        Err(e) => {
-                            eprintln!("Invalid packet: {}", e);
-                        }
+                Ok(_) => match parse_packet_line(&line) {
+                    Ok(packet) => {
+                        println!("{}", describe_packet(&packet));
+                        std::process::exit(1);
                     }
-                }
+                    Err(e) => {
+                        eprintln!("Invalid packet: {}", e);
+                    }
+                },
                 Err(e) => {
                     eprintln!("Read error: {}", e);
                     break;
@@ -81,17 +77,16 @@ pub async fn run(mut _rx: Receiver<String>) {
 
     let mut name = String::new();
 
-    print!("Enter your name (or !exit to leave chat): "); // Asks use for their name, then sends Packet::Join to the server
-    io::stdout().flush().unwrap();
-    io::stdin()
-        .read_line(&mut name)
-        .expect("Failed to read line");
+    print!("Enter your name (or !exit to leave chat): ");
+    std::io::stdout().flush().unwrap();
+
+    stdin.read_line(&mut name).await.unwrap();
 
     name = name.trim().to_string();
 
     if name.to_lowercase() == "!exit" {
         println!("Exiting...");
-        std::process::exit(0);
+        return;
     }
 
     let packet_join = Packet::Join(name.to_string());
@@ -104,10 +99,8 @@ pub async fn run(mut _rx: Receiver<String>) {
         // Repeatedly asks user for their message, sends packet to server
         let mut content = String::new();
         print!("Message (or !exit to leave chat): ");
-        io::stdout().flush().unwrap();
-        io::stdin()
-            .read_line(&mut content)
-            .expect("Failed to read line");
+        std::io::stdout().flush().unwrap();
+        stdin.read_line(&mut content).await.unwrap();
         let content = content.trim();
         if content.to_lowercase() == "!exit" {
             println!("Exiting...");
@@ -115,7 +108,7 @@ pub async fn run(mut _rx: Receiver<String>) {
             if send_packet_line(&mut writer, &packet_leave).await.is_err() {
                 eprintln!("Failed to send leave packet");
             }
-            std::process::exit(0);
+            return;
         }
         if content.is_empty() {
             println!("Message cannot be empty!");

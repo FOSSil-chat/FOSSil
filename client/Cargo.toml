@@ -9,3 +9,4 @@ serde = { version = "1", features = ["derive"] }
 eframe = { version = "0.31.1", features = ["default"] }
 tokio = { version = "1.52.3", features = ["full"] }
 fossil_shared = { path = "../fossil_shared" }
+socket2 = "0.5"

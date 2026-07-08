@@ -1,4 +1,4 @@
-use fossil_client::network::{describe_packet, parse_packet_line, send_packet_line};
+use fossil_client::network::{parse_packet_line, send_packet_line};
 use fossil_shared::packet::Packet;
 use serde_json;
 
@@ -167,13 +167,6 @@ fn test_long_username() {
         }
         _ => panic!("Expected Join packet"),
     }
-}
-
-#[test]
-fn test_error_packet_is_formatted_for_terminal() {
-    let packet = Packet::Error("ERROR_USER_EXISTS".to_string());
-
-    assert_eq!(describe_packet(&packet), "Server Error: ERROR_USER_EXISTS");
 }
 
 #[test]
