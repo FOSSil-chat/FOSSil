@@ -33,7 +33,7 @@ pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(
 
 pub async fn run(mut _rx: Receiver<String>) {
     println!("Listener running.");
-    let stream = match TcpStream::connect("192.168.0.52:7878").await {
+    let stream = match TcpStream::connect("fossil.simarpreetsingh.org:7878").await {
         Ok(s) => s,
         Err(_) => {
             eprintln!("Failed to connect to server");
