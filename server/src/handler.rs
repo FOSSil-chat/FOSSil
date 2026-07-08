@@ -5,9 +5,15 @@ use crate::server::ServerState;
 use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tokio::io::AsyncWriteExt;
 
-pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
+pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
+    state: Arc<Mutex<ServerState>>,
+    packet_type: Packet,
+    writer: &mut W,
+) {
     // Packet handler function
     match packet_type {
         Packet::Message { user, content } => {
@@ -15,7 +21,7 @@ pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
             let content_clone = content.clone();
 
             // If the packet type is 'message' it calls the handle_message() function
-            match handle_message(state, user, content) {
+            match handle_message(state, user, content).await {
                 Ok((id, timestamp)) => println!(
                     "{} said '{}' (ID {}) at {}.",
                     user_clone,
@@ -28,14 +34,14 @@ pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
         }
         Packet::Join(name) => {
             // If the packet type is 'Join', it calls the handle_join() function
-            match handle_join(state, name) {
+            match handle_join(state.clone(), name, writer).await {
                 Ok(_) => {}
                 Err(e) => println!("User joining failed: '{}'", e),
             }
         }
         Packet::Leave(name) => {
             // If the packet type is 'Leave', it calls the handle_leave() function
-            match handle_leave(state, name) {
+            match handle_leave(state.clone(), name, writer).await {
                 Ok(_) => {}
                 Err(e) => println!("User leaving failed: '{}'", e),
             }
@@ -43,13 +49,17 @@ pub fn packet_handler(state: Arc<Mutex<ServerState>>, packet_type: Packet) {
     }
 }
 
-pub fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
-    let mut state = state.lock().unwrap();
+pub async fn handle_join<W: AsyncWriteExt + Unpin>(
+    state: Arc<Mutex<ServerState>>,
+    name: String,
+    writer: &mut W,
+) -> Result<(), String> {
+    let mut state = state.lock().await;
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
     if state.connected_users.contains(&name) {
-        send_error("ERROR_USER_EXISTS".to_string());
+        send_error(writer, "ERROR_USER_EXISTS".to_string()).await;
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
@@ -58,14 +68,18 @@ pub fn handle_join(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), S
     Ok(())
 }
 
-pub fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
-    let mut state = state.lock().unwrap();
+pub async fn handle_leave<W: AsyncWriteExt + Unpin>(
+    state: Arc<Mutex<ServerState>>,
+    name: String,
+    writer: &mut W,
+) -> Result<(), String> {
+    let mut state = state.lock().await;
     if name.is_empty() {
-        send_error("ERROR_NAME_EMPTY".to_string());
+        send_error(writer, "ERROR_NAME_EMPTY".to_string()).await;
         return Err("Error: Name cannot be empty.".to_string());
     }
     if !state.connected_users.contains(&name) {
-        send_error("ERROR_USER_NOT_EXISTS".to_string());
+        send_error(writer, "ERROR_USER_NOT_EXISTS".to_string()).await;
         return Err("Error: User does not exist.".to_string());
     }
     // Leave handler
@@ -74,18 +88,16 @@ pub fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), 
     Ok(())
 }
 
-pub fn handle_message(
+pub async fn handle_message(
     state: Arc<Mutex<ServerState>>,
     user: String,
     content: String,
 ) -> Result<(u64, i64), String> {
-    let mut state = state.lock().unwrap();
+    let mut state = state.lock().await;
     if user.is_empty() {
-        send_error("ERROR_MISSING_SENDER".to_string());
         return Err("Error: Message does not have a sender.".to_string()); // Enforces sender
     }
     if content.is_empty() {
-        send_error("ERROR_MISSING_CONTENT".to_string());
         return Err("Error: Message does not have content.".to_string()); // Enforces content
     }
     let timestamp = Utc::now().timestamp_millis();
