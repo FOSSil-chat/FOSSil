@@ -1,6 +1,6 @@
 use crate::handler::packet_handler;
-use crate::packet::Packet;
 use crate::server::ServerState;
+use fossil_shared::packet::Packet;
 use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpListener;
@@ -35,10 +35,7 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
     }
 }
 
-pub async fn send_error<W: AsyncWriteExt + Unpin>(
-    writer: &mut W,
-    error_type: String,
-) {
+pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: String) {
     let error_packet = Packet::Error(error_type);
 
     if let Ok(error_json) = serde_json::to_string(&error_packet) {

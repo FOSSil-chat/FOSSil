@@ -1,6 +1,9 @@
 # Rust build output
 **/target/
 
+# Treedumper
+dump_tree.sh
+
 # Cargo lock 
 Cargo.lock
 

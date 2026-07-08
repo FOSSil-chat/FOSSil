@@ -1,5 +1,5 @@
 use fossil_client::network::{describe_packet, parse_packet_line, send_packet_line};
-use fossil_client::packet::Packet;
+use fossil_shared::packet::Packet;
 use serde_json;
 
 struct MockWriter {

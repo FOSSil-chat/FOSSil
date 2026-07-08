@@ -1,5 +1,5 @@
 // Imports and declarations
-use crate::packet::Message;
+use fossil_shared::message::Message;
 
 pub struct ServerState {
     // ServerState struct

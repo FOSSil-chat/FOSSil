@@ -1125,6 +1125,7 @@ name = "fossil-client"
 version = "0.1.0"
 dependencies = [
  "eframe",
+ "fossil_shared",
  "serde",
  "serde_json",
  "tokio",
@@ -1135,9 +1136,17 @@ name = "fossil-server"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "fossil_shared",
  "serde",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "fossil_shared"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

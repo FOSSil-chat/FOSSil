@@ -1,10 +1,10 @@
 // Imports and declarations
-use crate::packet::Message;
-use crate::packet::Packet;
 use crate::server::ServerState;
 use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
+use fossil_shared::message::Message;
+use fossil_shared::packet::Packet;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Mutex;

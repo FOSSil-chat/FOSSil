@@ -1,4 +1,4 @@
-use crate::packet::Packet;
+use fossil_shared::packet::Packet;
 use std::io::{self, Write};
 use tokio::io::AsyncBufReadExt;
 use tokio::io::AsyncWriteExt;
@@ -17,7 +17,10 @@ pub fn parse_packet_line(line: &str) -> Result<Packet, serde_json::Error> {
     serde_json::from_str::<Packet>(line.trim())
 }
 
-pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(writer: &mut W, packet: &Packet) -> io::Result<()> {
+pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(
+    writer: &mut W,
+    packet: &Packet,
+) -> io::Result<()> {
     let json = serde_json::to_string(packet).map_err(io::Error::other)?;
     writer.write_all(json.as_bytes()).await?;
     writer.write_all(b"\n").await?;

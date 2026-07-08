@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use fossil_server::handler::{handle_join, handle_leave, handle_message, packet_handler};
-use fossil_server::packet::Packet;
 use fossil_server::server::ServerState;
 use fossil_server::tcp::send_error;
+use fossil_shared::packet::Packet;
 use tokio::sync::Mutex;
 
 fn create_state() -> Arc<Mutex<ServerState>> {
