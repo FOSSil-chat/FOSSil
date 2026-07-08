@@ -62,8 +62,9 @@ pub async fn handle_join<W: AsyncWriteExt + Unpin>(
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
-    if state.connected_users.contains(&name) {
+    if state.connected_users.contains(&name) {  
         send_error(writer, "ERROR_USER_EXISTS".to_string()).await;
+        writer.shutdown().await.unwrap();   // <-- disconnect client
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
