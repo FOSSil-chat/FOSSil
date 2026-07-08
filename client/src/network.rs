@@ -31,6 +31,7 @@ pub async fn send_packet_line<W: AsyncWriteExt + Unpin>(
 }
 
 pub async fn run(mut _rx: Receiver<String>) {
+    println!("Listener running.");
     let stream = match TcpStream::connect("192.168.0.52:7878").await {
         Ok(s) => s,
         Err(_) => {
@@ -48,15 +49,30 @@ pub async fn run(mut _rx: Receiver<String>) {
         loop {
             line.clear();
             match reader.read_line(&mut line).await {
-                Ok(0) => break, // server disconnected :(
-                Ok(_) => match parse_packet_line(&line) {
-                    Ok(packet) => {
-                        println!("{}", describe_packet(&packet));
+                Ok(0) => {
+                    println!("Server disconnected.");
+                    break;
+                }
+                Ok(_) => {
+                    match parse_packet_line(&line) {
+                        Ok(packet) => {
+                            match packet {
+                                Packet::Error(err) => {
+                                    // Explicit error handling
+                                    println!("Server Error: {}", err);
+                                    std::process::exit(1); // disconnect client immediately
+                                }
+                                _ => {
+                                    // Normal packet handling
+                                    println!("{}", describe_packet(&packet));
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("Invalid packet: {}", e);
+                        }
                     }
-                    Err(e) => {
-                        eprintln!("Invalid packet: {}", e)
-                    }
-                },
+                }
                 Err(e) => {
                     eprintln!("Read error: {}", e);
                     break;
