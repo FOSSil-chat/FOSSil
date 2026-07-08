@@ -84,4 +84,5 @@ pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: St
     }
 }
 
-// TO-DO: SERVER ADDING DISCONNECTS
+// TO-DO: SERVER ADDING DISCONNECTS BROKEN TCPSTREAM
+// TO-DO: DOCUMENTATION
