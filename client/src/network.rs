@@ -5,7 +5,7 @@ use tokio::net::TcpStream;
 use tokio::sync::mpsc::Receiver;
 
 pub async fn run(mut _rx: Receiver<String>) {
-    let mut stream = match TcpStream::connect("fossil.simarpreetsingh.org:7878").await {
+    let mut stream = match TcpStream::connect("192.168.0.52:7878").await {
         Ok(s) => s,
         Err(_) => {
             eprintln!("Failed to connect to server");

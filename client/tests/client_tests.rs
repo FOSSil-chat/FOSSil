@@ -68,3 +68,107 @@ fn test_packet_deserialization() {
         }
     );
 }
+
+#[test]
+fn test_join_packet_serialization() {
+    let packet = Packet::Join("Alice".to_string());
+    let json = serde_json::to_string(&packet).unwrap();
+
+    assert!(json.contains("Alice"));
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+    assert_eq!(packet, deserialized);
+}
+
+#[test]
+fn test_leave_packet_serialization() {
+    let packet = Packet::Leave("Bob".to_string());
+    let json = serde_json::to_string(&packet).unwrap();
+
+    assert!(json.contains("Bob"));
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+    assert_eq!(packet, deserialized);
+}
+
+#[test]
+fn test_message_packet_with_special_characters() {
+    let packet = Packet::Message {
+        user: "Alice".to_string(),
+        content: "Hello, how are you? 🎉".to_string(),
+    };
+
+    let json = serde_json::to_string(&packet).unwrap();
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+
+    assert_eq!(packet, deserialized);
+}
+
+#[test]
+fn test_empty_message_content() {
+    let packet = Packet::Message {
+        user: "Alice".to_string(),
+        content: "".to_string(),
+    };
+
+    let json = serde_json::to_string(&packet).unwrap();
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+
+    assert_eq!(packet, deserialized);
+}
+
+#[test]
+fn test_long_username() {
+    let long_name = "a".repeat(256);
+    let packet = Packet::Join(long_name.clone());
+
+    match packet {
+        Packet::Join(name) => {
+            assert_eq!(name, long_name);
+        }
+        _ => panic!("Expected Join packet"),
+    }
+}
+
+#[test]
+fn test_long_message_content() {
+    let long_content = "Lorem ipsum dolor sit amet, ".repeat(100);
+    let packet = Packet::Message {
+        user: "Alice".to_string(),
+        content: long_content.clone(),
+    };
+
+    let json = serde_json::to_string(&packet).unwrap();
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+
+    assert_eq!(packet, deserialized);
+}
+
+#[test]
+fn test_multiple_packets_serialization() {
+    let packets = vec![
+        Packet::Join("Alice".to_string()),
+        Packet::Message {
+            user: "Alice".to_string(),
+            content: "Hello".to_string(),
+        },
+        Packet::Leave("Alice".to_string()),
+    ];
+
+    for packet in packets {
+        let json = serde_json::to_string(&packet).unwrap();
+        let deserialized: Packet = serde_json::from_str(&json).unwrap();
+        assert_eq!(packet, deserialized);
+    }
+}
+
+#[test]
+fn test_packet_with_unicode() {
+    let packet = Packet::Message {
+        user: "用户".to_string(),
+        content: "你好世界".to_string(),
+    };
+
+    let json = serde_json::to_string(&packet).unwrap();
+    let deserialized: Packet = serde_json::from_str(&json).unwrap();
+
+    assert_eq!(packet, deserialized);
+}
