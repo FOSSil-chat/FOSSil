@@ -3,6 +3,7 @@ use std::sync::Arc;
 use fossil_server::handler::{handle_join, handle_leave, handle_message, packet_handler};
 use fossil_server::packet::Packet;
 use fossil_server::server::ServerState;
+use fossil_server::tcp::send_error;
 use tokio::sync::Mutex;
 
 fn create_state() -> Arc<Mutex<ServerState>> {
@@ -17,11 +18,15 @@ fn create_state() -> Arc<Mutex<ServerState>> {
 #[allow(dead_code)]
 struct MockWriter {
     data: Vec<u8>,
+    flush_count: usize,
 }
 
 impl MockWriter {
     fn new() -> Self {
-        MockWriter { data: Vec::new() }
+        MockWriter {
+            data: Vec::new(),
+            flush_count: 0,
+        }
     }
 }
 
@@ -36,9 +41,10 @@ impl tokio::io::AsyncWrite for MockWriter {
     }
 
     fn poll_flush(
-        self: std::pin::Pin<&mut Self>,
+        mut self: std::pin::Pin<&mut Self>,
         _cx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<std::io::Result<()>> {
+        self.flush_count += 1;
         std::task::Poll::Ready(Ok(()))
     }
 
@@ -247,4 +253,17 @@ async fn test_message_timestamp_is_valid() {
 
     let state = state.lock().await;
     assert_eq!(state.messages[0].timestamp, timestamp);
+}
+
+#[tokio::test]
+async fn test_send_error_writes_json_and_flushes() {
+    let mut writer = MockWriter::new();
+
+    send_error(&mut writer, "ERROR_USER_EXISTS".to_string()).await;
+
+    let output = String::from_utf8(writer.data.clone()).unwrap();
+    assert!(output.contains("\"Error\""));
+    assert!(output.contains("ERROR_USER_EXISTS"));
+    assert!(output.ends_with('\n'));
+    assert_eq!(writer.flush_count, 1);
 }

@@ -44,5 +44,6 @@ pub async fn send_error<W: AsyncWriteExt + Unpin>(
     if let Ok(error_json) = serde_json::to_string(&error_packet) {
         let _ = writer.write_all(error_json.as_bytes()).await;
         let _ = writer.write_all(b"\n").await;
+        let _ = writer.flush().await;
     }
 }
