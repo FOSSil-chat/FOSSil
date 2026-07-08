@@ -4,7 +4,7 @@ use std::net::TcpStream;
 use std::sync::mpsc::Sender;
 
 pub fn run(_tx: Sender<String>) {
-    let mut stream = TcpStream::connect("192.168.0.52:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
+    let mut stream = TcpStream::connect("fossil.simarpreetsingh.org:7878").unwrap(); // Server may be down sometimes - this comment will be removed when we switch to Oracle Cloud.
 
     let mut name = String::new();
 
