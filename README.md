@@ -1,7 +1,7 @@
 # FOSSil Chat
 
 ## What is it?
-FOSSil Chat is a work-in-progress, privacy-focused chat platform featuring community-hosted, federated servers, end-to-end encryption (E2EE), and a user-friendly experience.
+FOSSil Chat is a work-in-progress, privacy-focused chat platform designed around community-hosting  , federated servers, end-to-end encryption (E2EE), and a user-friendly experience.
 ---
 ## Why does it exist?
 It exists to address a simple, yet important and often-overlooked problem - how can people communicate privately in an internet environment where control and surveillance are increasing?
@@ -19,12 +19,31 @@ Currently, we are under early development, with little code and functionality, b
 - Then, `cd` into the cloned directory, and type "cargo run" to run the program.
 ---
 ## Project Structure
-- [docs/](https://codeberg.org/FOSSil/FOSSil/src/branch/main/docs) contains documentation for the project.
-- [src/](https://codeberg.org/FOSSil/FOSSil/src/branch/main/src) contains [src/main.rs](https://codeberg.org/FOSSil/FOSSil/src/branch/main/src/main.rs) (the main file launching the program), [src/packet.rs](https://codeberg.org/FOSSil/FOSSil/src/branch/main/src/packet.rs) (the file containing the Packet enum), [src/handler.rs](https://codeberg.org/FOSSil/FOSSil/src/branch/main/src/handler.rs) (the packet handler), and [src/server.rs](https://codeberg.org/FOSSil/FOSSil/src/branch/main/src/server.rs) (containing the ServerState struct).
-- [Project Root](https://codeberg.org/FOSSil/FOSSil/src/branch/main) contains [Cargo.lock](https://codeberg.org/FOSSil/FOSSil/src/branch/main/Cargo.lock) and [.gitignore](https://codeberg.org/FOSSil/FOSSil/src/branch/main/.gitignore), which are unrelated to the program, [Cargo.toml](https://codeberg.org/FOSSil/FOSSil/src/branch/main/Cargo.toml), which is the Cargo config, [README.md](https://codeberg.org/FOSSil/FOSSil/src/branch/main/README.md), which is this file, [MAINTAINERS.md](https://codeberg.org/FOSSil/FOSSil/src/branch/main/MAINTAINERS.md), containing the names of the FOSSil Project maintainers, [CONTRIBUTING.md](https://codeberg.org/FOSSil/FOSSil/src/branch/main/CONTRIBUTING.md), which contains instructions on the format of writing code in this codebase, [LICENSE](https://codeberg.org/FOSSil/FOSSil/src/branch/main/LICENSE) which contains the GNU Affero General Public License v3.0, and [TRADEMARKS.md](https://codeberg.org/FOSSil/FOSSil/src/branch/main/TRADEMARKS.md), which contains trademark information.
+
+- [client/](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/client) contains the client application.
+  - [client/src/main.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/client/src/main.rs) is the entry point for the client. It starts the Tokio runtime, launches the networking task, and starts the GUI.
+  - [client/src/gui.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/client/src/gui.rs) contains the graphical user interface code using `eframe` and `egui`.
+  - [client/src/network.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/client/src/network.rs) handles TCP communication with the server. It connects to the server, sends packets, receives packets, and handles server responses.
+
+- [server/](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/server) contains the server application.
+  - [server/src/main.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/server/src/main.rs) is the entry point for the server. It creates the initial `ServerState` and starts the TCP listener.
+  - [server/src/tcp.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/server/src/tcp.rs) manages TCP connections. It accepts clients, configures TCP keepalive, reads incoming packets, and handles disconnected clients.
+  - [server/src/handler.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/server/src/handler.rs) contains packet handling logic. It processes joins, leaves, messages, and errors.
+  - [server/src/server.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/server/src/server.rs) contains the `ServerState` struct, which stores connected users, messages, and message IDs.
+
+- [fossil_shared/](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/fossil_shared) contains code shared between the client and server.
+  - [fossil_shared/src/lib.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/fossil_shared/src/lib.rs) exposes shared modules.
+  - [fossil_shared/src/packet.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/fossil_shared/src/packet.rs) contains the `Packet` enum, which defines the data types exchanged between client and server.
+  - [fossil_shared/src/message.rs](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/fossil_shared/src/message.rs) contains the `Message` struct used for storing message data.
+
+- [Project Root](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main) contains project configuration and metadata.
+  - [Cargo.toml](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/Cargo.toml) contains workspace configuration and dependencies.
+  - [Cargo.lock](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/Cargo.lock) contains locked dependency versions generated by Cargo.
+  - [.gitignore](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/.gitignore) contains files ignored by Git.
+  - [README.md](https://codeberg.org/FOSSil/FOSSil-Chat/src/branch/main/README.md) contains project documentation and usage instructions.
 
 > [!NOTE]
-> The project is in very early development, so there is no messaging system in place yet, but rather a program skeleton.
+> The project is in very early development - at the moment, we have a functioning CLI message system.
 
 > [!WARNING]
 > FOSSil is currently under active development and is not yet ready for production use. Features, protocols, and APIs may change without notice.
