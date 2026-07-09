@@ -1,4 +1,4 @@
-# FOSSil Chat
+# [FOSSil Chat](fossilproject.simarpreetsingh.org)
 
 ## What is it?
 FOSSil Chat is a work-in-progress, privacy-focused chat platform designed around community-hosting  , federated servers, end-to-end encryption (E2EE), and a user-friendly experience.
