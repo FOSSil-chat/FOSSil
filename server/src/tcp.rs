@@ -26,7 +26,9 @@ fn set_keepalive(stream: TcpStream) -> std::io::Result<TcpStream> {
 }
 
 pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
-    let listener = TcpListener::bind("fossil.simarpreetsingh.org:7878").await.unwrap(); // Creates TcpListener on localhost:7878
+    let listener = TcpListener::bind("fossil.simarpreetsingh.org:7878")
+        .await
+        .unwrap(); // Creates TcpListener on localhost:7878
 
     println!("Server running...");
     loop {
