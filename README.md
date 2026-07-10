@@ -16,7 +16,7 @@ Currently, we are under early development, with little code and functionality, b
 ## Getting Started
 - You need Rust and Cargo
 - To clone the repository, ensure you have Git installed, and type `git clone https://codeberg.org/FOSSil/FOSSil.git` into the terminal.
-- Then, `cd` into the cloned directory, and type "cargo run" to run the program.
+- Then, `cd` into the cloned directory, then `cd` into server or client, then run `cargo run` to run the program.
 ---
 ## Project Structure
 
