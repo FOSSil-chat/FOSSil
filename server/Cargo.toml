@@ -1,0 +1,15 @@
+[package]
+name = "fossil-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4"
+serde_json = "1.0"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1.52.3", features = ["full"] }
+fossil_shared = { path = "../fossil_shared" }
+socket2 = "0.5"
+
+[dev-dependencies]
+tokio = { version = "1.52.3", features = ["full", "macros"] }

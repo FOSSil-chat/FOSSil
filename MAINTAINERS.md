@@ -1,0 +1,2 @@
+- [Simarpreet Singh](https://codeberg.org/Simarpreet-Singh)
+- [Stefan Mitchell](https://codeberg.org/tsargalxygaming)

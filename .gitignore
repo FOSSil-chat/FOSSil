@@ -1,0 +1,35 @@
+# Rust build output
+**/target/
+
+# Treedumper
+dump_tree.sh
+output.txt
+
+# Cargo lock 
+Cargo.lock
+
+# IDE/editor files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Rust backup files
+**/*.rs.bk
+
+# Environment files (if you ever add them)
+.env
+.env.*
+
+# Test output artifacts (if you generate any)
+/target/
