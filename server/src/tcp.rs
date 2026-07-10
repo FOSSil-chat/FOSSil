@@ -83,4 +83,3 @@ pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: St
         let _ = writer.flush().await;
     }
 }
-

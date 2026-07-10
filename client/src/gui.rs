@@ -17,5 +17,3 @@ fn App() -> Element {
 
     }
 }
-
-
