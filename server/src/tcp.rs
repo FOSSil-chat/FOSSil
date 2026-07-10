@@ -17,7 +17,7 @@ fn set_keepalive(stream: TcpStream) -> std::io::Result<TcpStream> {
     socket.set_tcp_keepalive(
         &TcpKeepalive::new()
             .with_time(Duration::from_secs(60))
-            .with_interval(Duration::from_secs(10)),
+            .with_interval(Duration::from_secs(10))
     )?;
 
     socket.set_nonblocking(true)?;
@@ -83,6 +83,3 @@ pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: St
         let _ = writer.flush().await;
     }
 }
-
-// TO-DO: SERVER ADDING DISCONNECTS BROKEN TCPSTREAM
-// TO-DO: DOCUMENTATION
