@@ -14,7 +14,7 @@ pub fn launch() {
 
 #[component]
 fn App() -> Element {
-        let fonts = format!(
+    let fonts = format!(
         "@font-face {{
             font-family: 'Liberation Sans';
             src: url('{REGULAR}') format('truetype');
@@ -39,7 +39,7 @@ fn App() -> Element {
                 src: "{BG_IMAGE}",
                 style: "position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill;"
             }
-            
+
             div {
 
                 style: "position: absolute; top: 0; left: 0; width: 100%; height: 100%;
