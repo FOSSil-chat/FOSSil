@@ -33,7 +33,12 @@ fn App() -> Element {
          background-image: url('{BG_IMAGE}');
          background-size: cover;
          background-position: center;
-         background-repeat: no-repeat;"
+         background-repeat: no-repeat;
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: flex-end;
+         padding-right: 40px;"
     );
 
     rsx! {
