@@ -46,8 +46,8 @@ fn App() -> Element {
 
             style: "{rsx_style}",            
 
-            h1 { 
-                style: "font-family: 'Liberation Sans'; font-weight: bold;",
+            p { 
+                style: "font-family: 'Liberation Sans'; font-weight: bold; font-size: 24px;",
                 "FOSSil Chat" 
             }
 
