@@ -44,7 +44,7 @@ fn App() -> Element {
 
         div { 
 
-            style: { "{rsx_style}" }            
+            style: "{rsx_style}",            
 
             h1 { 
                 style: "font-family: 'Liberation Sans'; font-weight: bold;",
