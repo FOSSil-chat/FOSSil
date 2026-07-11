@@ -14,7 +14,6 @@ pub fn launch() {
 
 #[component]
 fn App() -> Element {
-
     let fonts = format!(
         "@font-face {{
             font-family: 'Liberation Sans Regular';
@@ -26,7 +25,6 @@ fn App() -> Element {
             src: url('{BOLD}') format('truetype');
             font-weight: bold;
         }}"
-
     );
 
     let rsx_style = format!(
@@ -42,22 +40,22 @@ fn App() -> Element {
 
         style { "{fonts}" }
 
-        div { 
+        div {
 
-            style: "{rsx_style}",            
+            style: "{rsx_style}",
 
-            p { 
+            p {
                 style: "font-family: 'Liberation Sans'; font-weight: bold; font-size: 24px;",
-                "FOSSil Chat" 
+                "FOSSil Chat"
             }
 
-            p { 
+            p {
                 style: "font-family: 'Liberation Sans'; font-weight: normal;",
-                "Welcome to FOSSil Chat!" 
+                "Welcome to FOSSil Chat!"
             }
-            
 
-            
+
+
 
         }
 
