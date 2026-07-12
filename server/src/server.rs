@@ -11,7 +11,7 @@ pub struct Client {
 
 pub struct ServerState {
     // ServerState struct
-    pub clients: Vec<Client>,         // Connected clients with their message senders
-    pub messages: Vec<Message>,       // Messages Vec storing Message struct
-    pub next_message_id: u64,         // Stores ID to use for the next message
+    pub clients: Vec<Client>, // Connected clients with their message senders
+    pub messages: Vec<Message>, // Messages Vec storing Message struct
+    pub next_message_id: u64, // Stores ID to use for the next message
 }

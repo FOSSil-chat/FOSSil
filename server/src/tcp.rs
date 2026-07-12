@@ -45,10 +45,10 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
             let (reader, writer) = stream.into_split();
             let mut buf_reader = BufReader::new(reader);
             let mut buf_writer = writer;
-            
+
             // Create a channel for this client to receive messages
             let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
-            
+
             let mut line = String::new();
             let mut username: Option<String> = None;
 
@@ -91,10 +91,7 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
     }
 }
 
-pub async fn send_error(
-    sender: &tokio::sync::mpsc::UnboundedSender<Packet>,
-    error_type: String,
-) {
+pub async fn send_error(sender: &tokio::sync::mpsc::UnboundedSender<Packet>, error_type: String) {
     let error_packet = Packet::Error(error_type);
     let _ = sender.send(error_packet);
 }

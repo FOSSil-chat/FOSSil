@@ -13,7 +13,10 @@ fn create_state() -> Arc<Mutex<ServerState>> {
     }))
 }
 
-fn create_client_channel() -> (tokio::sync::mpsc::UnboundedSender<Packet>, tokio::sync::mpsc::UnboundedReceiver<Packet>) {
+fn create_client_channel() -> (
+    tokio::sync::mpsc::UnboundedSender<Packet>,
+    tokio::sync::mpsc::UnboundedReceiver<Packet>,
+) {
     tokio::sync::mpsc::unbounded_channel()
 }
 
@@ -174,18 +177,14 @@ async fn test_broadcast_message_to_single_client() {
         .await
         .unwrap();
 
-    handle_message(
-        state.clone(),
-        "Alice".to_string(),
-        "Hello".to_string(),
-    )
-    .await
-    .unwrap();
+    handle_message(state.clone(), "Alice".to_string(), "Hello".to_string())
+        .await
+        .unwrap();
 
     // Client should receive the message
     let received = rx.recv().await;
     assert!(received.is_some());
-    
+
     if let Some(Packet::Message { user, content }) = received {
         assert_eq!(user, "Alice");
         assert_eq!(content, "Hello");
@@ -300,12 +299,20 @@ async fn test_multiple_messages_broadcast_to_all() {
     assert!(msg2_bob.is_some());
 
     // Verify message order
-    if let Some(Packet::Message { user: u1, content: c1 }) = msg1 {
+    if let Some(Packet::Message {
+        user: u1,
+        content: c1,
+    }) = msg1
+    {
         assert_eq!(u1, "Alice");
         assert_eq!(c1, "First message");
     }
 
-    if let Some(Packet::Message { user: u2, content: c2 }) = msg2 {
+    if let Some(Packet::Message {
+        user: u2,
+        content: c2,
+    }) = msg2
+    {
         assert_eq!(u2, "Bob");
         assert_eq!(c2, "Second message");
     }
@@ -451,13 +458,9 @@ async fn test_message_timestamp_is_valid() {
         .await
         .unwrap();
 
-    let (_, timestamp) = handle_message(
-        state.clone(),
-        "Alice".to_string(),
-        "Hello".to_string(),
-    )
-    .await
-    .unwrap();
+    let (_, timestamp) = handle_message(state.clone(), "Alice".to_string(), "Hello".to_string())
+        .await
+        .unwrap();
     assert!(timestamp > 0);
 
     let state = state.lock().await;
@@ -488,16 +491,11 @@ async fn test_broadcast_to_only_existing_clients() {
         .unwrap();
 
     // Alice sends a message
-    handle_message(
-        state.clone(),
-        "Alice".to_string(),
-        "Message".to_string(),
-    )
-    .await
-    .unwrap();
+    handle_message(state.clone(), "Alice".to_string(), "Message".to_string())
+        .await
+        .unwrap();
 
     // Only Alice and Bob should receive it
     assert!(rx_alice.recv().await.is_some());
     assert!(rx_bob.recv().await.is_some());
 }
-

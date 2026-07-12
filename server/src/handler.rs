@@ -1,5 +1,5 @@
 // Imports and declarations
-use crate::server::{ServerState, Client};
+use crate::server::{Client, ServerState};
 use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
@@ -110,12 +110,12 @@ pub async fn handle_message(
         timestamp,
     });
     state.next_message_id += 1; // Increments the next message ID counter
-    
+
     // Broadcast message to all connected clients
     let message_packet = Packet::Message { user, content };
     for client in &state.clients {
         let _ = client.sender.send(message_packet.clone());
     }
-    
+
     Ok((id, timestamp))
 }

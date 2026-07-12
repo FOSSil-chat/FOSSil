@@ -1,9 +1,9 @@
 use fossil_client::gui;
 use fossil_client::network;
-use tokio::sync::mpsc;
+use fossil_shared::packet::Packet;
 use std::sync::{Arc, Mutex};
-use fossil_shared::packet::Packet;  
-type Clients = Arc<Mutex<Vec<mpsc::Sender<Packet>>>>;
+use tokio::sync::mpsc;
+type _Clients = Arc<Mutex<Vec<mpsc::Sender<Packet>>>>;
 
 #[tokio::main]
 async fn main() {
