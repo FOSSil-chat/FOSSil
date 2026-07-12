@@ -12,11 +12,9 @@ use tokio::{
     sync::mpsc::{self, Receiver},
 };
 
-
 pub fn disconnect() {
     std::process::exit(1);
 }
-
 
 fn get_color_for_user(username: &str) -> u8 {
     let mut hasher = DefaultHasher::new();
@@ -35,23 +33,16 @@ pub fn describe_packet(packet: &Packet) -> String {
         Packet::Message { user, content } => {
             let color = get_color_for_user(user);
 
-            format!(
-                "\x1b[38;5;{}m{}: {}\x1b[0m",
-                color,
-                user,
-                content
-            )
+            format!("\x1b[38;5;{}m{}: {}\x1b[0m", color, user, content)
         }
 
         _ => String::new(),
     }
 }
 
-
 pub fn parse_packet_line(line: &str) -> Result<Packet, serde_json::Error> {
     serde_json::from_str(line.trim())
 }
-
 
 pub async fn send_packet_line<W>(
     writer: &mut W,
@@ -69,13 +60,8 @@ where
     Ok(())
 }
 
-
 pub async fn run(mut _rx: Receiver<String>) {
-    let stream = match TcpStream::connect(
-        "fossil.simarpreetsingh.org:7878"
-    )
-    .await
-    {
+    let stream = match TcpStream::connect("fossil.simarpreetsingh.org:7878").await {
         Ok(stream) => stream,
 
         Err(_) => {
@@ -84,10 +70,8 @@ pub async fn run(mut _rx: Receiver<String>) {
         }
     };
 
-
     let (reader, mut writer) = stream.into_split();
     let mut reader = BufReader::new(reader);
-
 
     let (packet_tx, mut packet_rx) = mpsc::channel::<Packet>(100);
 
@@ -111,7 +95,6 @@ pub async fn run(mut _rx: Receiver<String>) {
         }
     });
 
-
     let (input_tx, mut input_rx) = mpsc::channel::<String>(100);
 
     tokio::spawn(async move {
@@ -125,12 +108,9 @@ pub async fn run(mut _rx: Receiver<String>) {
                 break;
             }
 
-            let _ = input_tx
-                .send(input.trim().to_string())
-                .await;
+            let _ = input_tx.send(input.trim().to_string()).await;
         }
     });
-
 
     let name = loop {
         print!("Enter your name (or !exit to leave chat): ");
@@ -142,29 +122,18 @@ pub async fn run(mut _rx: Receiver<String>) {
             None => return,
         };
 
-
         if username == "!exit" {
             return;
         }
 
-
         let packet = Packet::Join(username.clone());
 
-        if send_packet_line(&mut writer, &packet)
-            .await
-            .is_err()
-        {
+        if send_packet_line(&mut writer, &packet).await.is_err() {
             eprintln!("Failed to send join packet");
             return;
         }
 
-
-        match tokio::time::timeout(
-            std::time::Duration::from_secs(2),
-            packet_rx.recv(),
-        )
-        .await
-        {
+        match tokio::time::timeout(std::time::Duration::from_secs(2), packet_rx.recv()).await {
             Ok(Some(Packet::Error(error))) => {
                 println!("\x1b[31m[Error] {}\x1b[0m", error);
             }
@@ -173,14 +142,11 @@ pub async fn run(mut _rx: Receiver<String>) {
         }
     };
 
-
     println!("\nJoined chat as {}\n", name);
-
 
     loop {
         print!("Message (or !exit to leave chat): ");
         std::io::stdout().flush().unwrap();
-
 
         tokio::select! {
             Some(input) = input_rx.recv() => {
