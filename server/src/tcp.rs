@@ -45,41 +45,56 @@ pub async fn tcp_listener(state: Arc<Mutex<ServerState>>) {
             let (reader, writer) = stream.into_split();
             let mut buf_reader = BufReader::new(reader);
             let mut buf_writer = writer;
+            
+            // Create a channel for this client to receive messages
+            let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel();
+            
             let mut line = String::new();
             let mut username: Option<String> = None;
 
             loop {
                 line.clear();
 
-                match buf_reader.read_line(&mut line).await {
-                    Ok(0) => break,
-                    Ok(_) => {
-                        if let Ok(packet) = serde_json::from_str::<Packet>(&line) {
-                            if let Packet::Join(name) = &packet {
-                                username = Some(name.clone());
-                            }
+                tokio::select! {
+                    // Handle incoming packets from the client
+                    read_result = buf_reader.read_line(&mut line) => {
+                        match read_result {
+                            Ok(0) => break,
+                            Ok(_) => {
+                                if let Ok(packet) = serde_json::from_str::<Packet>(&line) {
+                                    if let Packet::Join(name) = &packet {
+                                        username = Some(name.clone());
+                                    }
 
-                            packet_handler(state.clone(), packet, &mut buf_writer).await;
+                                    packet_handler(state.clone(), packet, tx.clone()).await;
+                                }
+                            }
+                            Err(_) => break,
                         }
                     }
-                    Err(_) => break,
+                    // Handle outgoing messages for this client
+                    Some(packet) = rx.recv() => {
+                        if let Ok(packet_json) = serde_json::to_string(&packet) {
+                            let _ = buf_writer.write_all(packet_json.as_bytes()).await;
+                            let _ = buf_writer.write_all(b"\n").await;
+                            let _ = buf_writer.flush().await;
+                        }
+                    }
                 }
             }
 
             // Connection closed/crashed, fake a Leave packet
             if let Some(name) = username {
-                packet_handler(state.clone(), Packet::Leave(name), &mut buf_writer).await;
+                packet_handler(state.clone(), Packet::Leave(name), tx).await;
             }
         });
     }
 }
 
-pub async fn send_error<W: AsyncWriteExt + Unpin>(writer: &mut W, error_type: String) {
+pub async fn send_error(
+    sender: &tokio::sync::mpsc::UnboundedSender<Packet>,
+    error_type: String,
+) {
     let error_packet = Packet::Error(error_type);
-
-    if let Ok(error_json) = serde_json::to_string(&error_packet) {
-        let _ = writer.write_all(error_json.as_bytes()).await;
-        let _ = writer.write_all(b"\n").await;
-        let _ = writer.flush().await;
-    }
+    let _ = sender.send(error_packet);
 }

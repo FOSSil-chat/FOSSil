@@ -1,18 +1,17 @@
 // Imports and declarations
-use crate::server::ServerState;
+use crate::server::{ServerState, Client};
 use crate::tcp::send_error;
 use chrono::DateTime;
 use chrono::Utc;
 use fossil_shared::message::Message;
 use fossil_shared::packet::Packet;
 use std::sync::Arc;
-use tokio::io::AsyncWriteExt;
 use tokio::sync::Mutex;
 
-pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
+pub async fn packet_handler(
     state: Arc<Mutex<ServerState>>,
     packet_type: Packet,
-    writer: &mut W,
+    sender: tokio::sync::mpsc::UnboundedSender<Packet>,
 ) {
     // Packet handler function
     match packet_type {
@@ -21,7 +20,7 @@ pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
             let content_clone = content.clone();
 
             // If the packet type is 'message' it calls the handle_message() function
-            match handle_message(state, user, content, writer).await {
+            match handle_message(state, user, content).await {
                 Ok((id, timestamp)) => println!(
                     "{} said '{}' (ID {}) at {}.",
                     user_clone,
@@ -29,19 +28,22 @@ pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
                     id,
                     DateTime::<Utc>::from_timestamp_millis(timestamp).unwrap()
                 ),
-                Err(e) => println!("Error sending message: '{}'", e),
+                Err(e) => {
+                    let _ = send_error(&sender, "ERROR_MESSAGE_FAILED".to_string()).await;
+                    println!("Error sending message: '{}'", e);
+                }
             }
         }
         Packet::Join(name) => {
             // If the packet type is 'Join', it calls the handle_join() function
-            match handle_join(state.clone(), name, writer).await {
+            match handle_join(state.clone(), name, sender).await {
                 Ok(_) => {}
                 Err(e) => println!("User joining failed: '{}'", e),
             }
         }
         Packet::Leave(name) => {
             // If the packet type is 'Leave', it calls the handle_leave() function
-            match handle_leave(state.clone(), name, writer).await {
+            match handle_leave(state.clone(), name).await {
                 Ok(_) => {}
                 Err(e) => println!("User leaving failed: '{}'", e),
             }
@@ -53,58 +55,49 @@ pub async fn packet_handler<W: AsyncWriteExt + Unpin>(
     }
 }
 
-pub async fn handle_join<W: AsyncWriteExt + Unpin>(
+pub async fn handle_join(
     state: Arc<Mutex<ServerState>>,
     name: String,
-    writer: &mut W,
+    sender: tokio::sync::mpsc::UnboundedSender<Packet>,
 ) -> Result<(), String> {
     let mut state = state.lock().await;
     if name.is_empty() {
         return Err("Error: Name cannot be empty.".to_string());
     }
-    if state.connected_users.contains(&name) {
-        send_error(writer, "ERROR_USER_EXISTS".to_string()).await;
+    if state.clients.iter().any(|c| c.name == name) {
+        let _ = send_error(&sender, "ERROR_USER_EXISTS".to_string()).await;
         return Err("Error: User already joined.".to_string());
     }
     // Join handler
     println!("\n{} joined.", name); // Prints that a user joined
-    state.connected_users.push(name); // Adds the user to the ServerState's connected_users Vec
+    state.clients.push(Client { name, sender }); // Adds the client to the ServerState's clients Vec
     Ok(())
 }
 
-pub async fn handle_leave<W: AsyncWriteExt + Unpin>(
-    state: Arc<Mutex<ServerState>>,
-    name: String,
-    writer: &mut W,
-) -> Result<(), String> {
+pub async fn handle_leave(state: Arc<Mutex<ServerState>>, name: String) -> Result<(), String> {
     let mut state = state.lock().await;
     if name.is_empty() {
-        send_error(writer, "ERROR_NAME_EMPTY".to_string()).await;
         return Err("Error: Name cannot be empty.".to_string());
     }
-    if !state.connected_users.contains(&name) {
-        send_error(writer, "ERROR_USER_NOT_EXISTS".to_string()).await;
+    if !state.clients.iter().any(|c| c.name == name) {
         return Err("Error: User does not exist.".to_string());
     }
     // Leave handler
     println!("\n{} left.", name); // Print that a user left
-    state.connected_users.retain(|user| user != &name); // Removes the user from the ServerState's connected_users Vec (retain() requires a list of all items to keep, so this inline function outputs all users except the one to remove)
+    state.clients.retain(|client| client.name != name); // Removes the client from the ServerState's clients Vec
     Ok(())
 }
 
-pub async fn handle_message<W: AsyncWriteExt + Unpin>(
+pub async fn handle_message(
     state: Arc<Mutex<ServerState>>,
     user: String,
     content: String,
-    writer: &mut W,
 ) -> Result<(u64, i64), String> {
     let mut state = state.lock().await;
     if user.is_empty() {
-        send_error(writer, "ERROR_USER_EMPTY".to_string()).await;
         return Err("Error: Message does not have a sender.".to_string()); // Enforces sender
     }
     if content.is_empty() {
-        send_error(writer, "ERROR_CONTENT_EMPTY".to_string()).await;
         return Err("Error: Message does not have content.".to_string()); // Enforces content
     }
     let timestamp = Utc::now().timestamp_millis();
@@ -117,5 +110,12 @@ pub async fn handle_message<W: AsyncWriteExt + Unpin>(
         timestamp,
     });
     state.next_message_id += 1; // Increments the next message ID counter
+    
+    // Broadcast message to all connected clients
+    let message_packet = Packet::Message { user, content };
+    for client in &state.clients {
+        let _ = client.sender.send(message_packet.clone());
+    }
+    
     Ok((id, timestamp))
 }

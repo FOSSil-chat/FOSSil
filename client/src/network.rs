@@ -12,6 +12,9 @@ pub fn describe_packet(packet: &Packet) -> String {
         Packet::Error(error) => {
             format!("\n\x1b[31mServer Error: {}\x1b[0m", error)
         }
+        Packet::Message { user, content } => {
+            format!("\n\x1b[32m{}: {}\x1b[0m", user, content)
+        }
         other => format!("Received: {:?}", other),
     }
 }
