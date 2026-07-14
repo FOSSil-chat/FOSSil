@@ -1,3 +1,7 @@
+# FOSSil Project Trademark Policy
+
+Copyright (C) 2026 FOSSil Group (Simarpreet Singh & Stefan Mitchell)
+
 ## Introduction
 
 This is the FOSSil Project's policy for the use of our trademarks. While our work is available under free and open source software licenses, those licenses do not include a license to use our trademarks.
