@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Build and publish release
@@ -21,10 +24,19 @@ jobs:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
       - name: Create version tag
         id: version
-        env:
-          FORGEJO_TOKEN: ${{ secrets.FOSSIL_RELEASES }}
         run: |
           git config user.name "Codeberg Actions"
           git config user.email "actions@codeberg.org"
@@ -36,15 +48,21 @@ jobs:
           if [ -z "$latest" ]; then
             version="v0.0.1"
           else
-            version=$(echo "$latest" | awk -F. '{print $1"."$2"."$3+1}')
+            major=$(echo "$latest" | cut -d. -f1 | tr -d 'v')
+            minor=$(echo "$latest" | cut -d. -f2)
+            patch=$(echo "$latest" | cut -d. -f3)
+
+            patch=$((patch + 1))
+
+            version="v${major}.${minor}.${patch}"
           fi
 
-          echo "Creating release $version"
-
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Creating tag: $version"
 
           git tag "$version"
           git push origin "$version"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build release binaries
         run: |
@@ -64,6 +82,7 @@ jobs:
         with:
           token: ${{ secrets.FOSSIL_RELEASES }}
           direction: upload
+          tag: ${{ steps.version.outputs.version }}
           release-dir: .
           files: |
             fossil-chat-linux-x86_64.tar.gz
