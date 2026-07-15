@@ -2,8 +2,8 @@ name: Build and Release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 permissions:
   contents: write
@@ -35,54 +35,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Create version tag
-        id: version
+      - name: Test
         run: |
-          git config user.name "Codeberg Actions"
-          git config user.email "actions@codeberg.org"
-
-          git fetch --tags
-
-          latest=$(git tag --list "v*" --sort=-v:refname | head -n 1)
-
-          if [ -z "$latest" ]; then
-            version="v0.0.1"
-          else
-            major=$(echo "$latest" | cut -d. -f1 | tr -d 'v')
-            minor=$(echo "$latest" | cut -d. -f2)
-            patch=$(echo "$latest" | cut -d. -f3)
-
-            patch=$((patch + 1))
-
-            version="v${major}.${minor}.${patch}"
-          fi
-
-          echo "Creating tag: $version"
-
-          git tag "$version"
-          git push origin "$version"
-
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          source "$HOME/.cargo/env"
+          cargo test --all --locked
 
       - name: Build release binaries
         run: |
+          source "$HOME/.cargo/env"
           cargo build --release --all --all-features --locked
 
       - name: Package binaries
         run: |
           mkdir -p artifacts
 
-          cp target/release/fossil-client artifacts/ || true
-          cp target/release/fossil-server artifacts/ || true
+          cp target/release/fossil-client artifacts/
+          cp target/release/fossil-server artifacts/
 
           tar -czf fossil-chat-linux-x86_64.tar.gz -C artifacts .
+
+          sha256sum fossil-chat-linux-x86_64.tar.gz > SHA256SUMS
 
       - name: Create Codeberg Release
         uses: https://code.forgejo.org/actions/forgejo-release@v2
         with:
           token: ${{ secrets.FOSSIL_RELEASES }}
           direction: upload
-          tag: ${{ steps.version.outputs.version }}
+          tag: ${{ github.ref_name }}
           release-dir: .
           files: |
             fossil-chat-linux-x86_64.tar.gz
+            SHA256SUMS
