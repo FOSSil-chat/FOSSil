@@ -123,7 +123,7 @@ pub async fn run(mut _rx: Receiver<String>) {
         };
 
         if username == "!exit" {
-            return;
+            std::process::exit(0);
         }
 
         let packet = Packet::Join(username.clone());
@@ -156,8 +156,7 @@ pub async fn run(mut _rx: Receiver<String>) {
                         &Packet::Leave(name.clone()),
                     )
                     .await;
-
-                    break;
+                    std::process::exit(0);
                 }
 
 
