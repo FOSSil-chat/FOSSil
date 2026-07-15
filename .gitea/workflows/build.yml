@@ -1,0 +1,49 @@
+name: Build binaries
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: docker
+
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+          - aarch64-apple-darwin
+
+    container:
+      image: rust:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package binary
+        run: |
+          mkdir release
+
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            cp target/${{ matrix.target }}/release/*.exe release/
+            tar -czf fossil-chat-${{ matrix.target }}.tar.gz release
+          else
+            cp target/${{ matrix.target }}/release/fossil-chat release/
+            tar -czf fossil-chat-${{ matrix.target }}.tar.gz release
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fossil-chat-${{ matrix.target }}
+          path: fossil-chat-${{ matrix.target }}.tar.gz
