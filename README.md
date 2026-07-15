@@ -48,4 +48,4 @@ Currently, we are under early development, with little code and functionality, b
 > [!WARNING]
 > FOSSil is currently under active development and is not yet ready for production use. Features, protocols, and APIs may change without notice.
 
-This project is licensed under the GNU AGPL-3.0 License.
+This project is licensed under the GNU AGPL-3.0 License. Read TRADEMARKS.md and LICENSE.md for legal information.
