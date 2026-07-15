@@ -33,7 +33,7 @@ jobs:
           tar -czf fossil-chat-linux-x86_64.tar.gz -C artifacts .
 
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: fossil-chat-linux-x86_64
           path: fossil-chat-linux-x86_64.tar.gz
