@@ -7,43 +7,33 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.target }}
-    runs-on: docker
-
-    strategy:
-      matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-gnu
-          - aarch64-apple-darwin
-
-    container:
-      image: rust:latest
+    name: Build release binaries
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install target
-        run: rustup target add ${{ matrix.target }}
-
-      - name: Build release binary
-        run: cargo build --release --target ${{ matrix.target }}
-
-      - name: Package binary
+      - name: Install Rust
         run: |
-          mkdir release
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          source $HOME/.cargo/env
 
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cp target/${{ matrix.target }}/release/*.exe release/
-            tar -czf fossil-chat-${{ matrix.target }}.tar.gz release
-          else
-            cp target/${{ matrix.target }}/release/fossil-chat release/
-            tar -czf fossil-chat-${{ matrix.target }}.tar.gz release
-          fi
+      - name: Build release binaries
+        run: |
+          source $HOME/.cargo/env
+          cargo build --release --all --all-features --locked
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Package binaries
+        run: |
+          mkdir -p artifacts
+
+          cp target/release/* artifacts/ || true
+
+          tar -czf fossil-chat-linux-x86_64.tar.gz -C artifacts .
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
         with:
-          name: fossil-chat-${{ matrix.target }}
-          path: fossil-chat-${{ matrix.target }}.tar.gz
+          name: fossil-chat-linux-x86_64
+          path: fossil-chat-linux-x86_64.tar.gz
