@@ -24,7 +24,7 @@ jobs:
       - name: Create version tag
         id: version
         env:
-          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          FORGEJO_TOKEN: ${{ secrets.FOSSIL_RELEASES }}
         run: |
           git config user.name "Codeberg Actions"
           git config user.email "actions@codeberg.org"
