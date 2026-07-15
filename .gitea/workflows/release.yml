@@ -19,7 +19,7 @@ jobs:
       - name: Install Rust
         run: |
           curl https://sh.rustup.rs -sSf | sh -s -- -y
-          source $HOME/.cargo/env
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Create version tag
         id: version
@@ -39,14 +39,15 @@ jobs:
             version=$(echo "$latest" | awk -F. '{print $1"."$2"."$3+1}')
           fi
 
-          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Creating release $version"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
           git tag "$version"
           git push origin "$version"
 
       - name: Build release binaries
         run: |
-          source $HOME/.cargo/env
           cargo build --release --all --all-features --locked
 
       - name: Package binaries
@@ -59,10 +60,10 @@ jobs:
           tar -czf fossil-chat-linux-x86_64.tar.gz -C artifacts .
 
       - name: Create Codeberg Release
-        uses: https://codeberg.org/actions/forgejo-release@v1
+        uses: https://code.forgejo.org/actions/forgejo-release@v2
         with:
-          token: ${{ secrets.FORGEJO_TOKEN }}
-          tag: ${{ steps.version.outputs.version }}
+          token: ${{ secrets.FOSSIL_RELEASES }}
+          direction: upload
           release-dir: .
           files: |
             fossil-chat-linux-x86_64.tar.gz
