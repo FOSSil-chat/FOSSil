@@ -1,7 +1,7 @@
 # FOSSil Chat
 
 ## What is it?
-#### FOSSil Chat is a work-in-progress, privacy-focused chat platform designed around community-hosting  , federated servers, end-to-end encryption (E2EE), and a user-friendly experience.
+#### FOSSil Chat is a work-in-progress, privacy-focused chat platform designed around community-hosting, federated servers, end-to-end encryption (E2EE), and a user-friendly experience.
 ---
 ## Why does it exist?
 #### It exists to address a simple, yet important and often-overlooked problem - how can people communicate privately in an internet environment where control and surveillance are increasing?
