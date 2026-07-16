@@ -49,4 +49,4 @@ The format is based on Keep a Changelog.
 - Limited client features
 
 [Unreleased]: https://codeberg.org/FOSSil-Chat/FOSSil-Chat/compare/v0.1.0...HEAD
-[0.1.0]: https://codeberg.org/FOSSil-Chat/FOSSil-Chat/releases/tag/v0.1.0
+[0.1.0]: https://codeberg.org/FOSSil/FOSSil-Chat/releases/tag/v0.1.0
