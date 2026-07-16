@@ -20,7 +20,7 @@ The format is based on Keep a Changelog.
 
 ---
 
-## [0.1.0] - 2026-07-16
+## [v0.1.0] - 2026-07-16
 
 ### Added
 
@@ -49,4 +49,4 @@ The format is based on Keep a Changelog.
 - Limited client features
 
 [Unreleased]: https://codeberg.org/FOSSil/FOSSil-Chat/compare/v0.1.0...main
-[0.1.0]: https://codeberg.org/FOSSil/FOSSil-Chat/releases/tag/v0.1.0
+[v0.1.0]: https://codeberg.org/FOSSil/FOSSil-Chat/releases/tag/v0.1.0
