@@ -48,5 +48,5 @@ The format is based on Keep a Changelog.
 - No file sharing
 - Limited client features
 
-[Unreleased]: https://codeberg.org/FOSSil-Chat/FOSSil-Chat/compare/v0.1.0...HEAD
+[Unreleased]: https://codeberg.org/FOSSil/FOSSil-Chat/compare/v0.1.0...main
 [0.1.0]: https://codeberg.org/FOSSil/FOSSil-Chat/releases/tag/v0.1.0
